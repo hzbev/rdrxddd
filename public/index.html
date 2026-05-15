@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS2 Radar</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">CS2 WebSocket Radar</p>
+          <h1 id="map-name">de_mirage</h1>
+        </div>
+        <div class="match-meta">
+          <span id="tick">Tick 0</span>
+          <span id="reader-status">Waiting for reader</span>
+          <span id="socket-status">Connecting</span>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="team-panel">
+          <h2>Counter-Terrorists</h2>
+          <div id="ct-list"></div>
+        </aside>
+
+        <section class="radar-card">
+          <div id="radar" class="radar">
+            <div class="radar-vignette"></div>
+          </div>
+          <div id="bomb-status" class="bomb-status"></div>
+        </section>
+
+        <aside class="team-panel">
+          <h2>Terrorists</h2>
+          <div id="t-list"></div>
+        </aside>
+      </section>
+
+      <section class="feed-card">
+        <div class="feed-row">
+          <div>
+            <h2>Live Feed</h2>
+            <p>Start this Express app, run the native reader, then open this page. The reader connects to <code>ws://127.0.0.1:3000/ws</code> and broadcasts each radar update here.</p>
+          </div>
+          <strong id="last-update">No updates yet</strong>
+        </div>
+      </section>
+    </main>
+
+    <script src="/client.js"></script>
+  </body>
+</html>

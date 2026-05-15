@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Radar Feed Control</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell control-shell">
+      <section class="feed-card control-card">
+        <p class="eyebrow">Hidden Control</p>
+        <h1>Radar Feed</h1>
+        <p>Disable this to pause receiving reader updates and stop rebroadcasting radar state to connected viewers.</p>
+
+        <div class="control-status">
+          <strong id="state-label">Loading</strong>
+          <span id="detail-label">Checking server...</span>
+        </div>
+
+        <div class="control-actions">
+          <button id="enable-button" type="button">Enabled</button>
+          <button id="disable-button" type="button">Disabled</button>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const stateLabel = document.querySelector("#state-label");
+      const detailLabel = document.querySelector("#detail-label");
+      const enableButton = document.querySelector("#enable-button");
+      const disableButton = document.querySelector("#disable-button");
+
+      async function loadStatus() {
+        const response = await fetch("/control/status", { cache: "no-store" });
+        const status = await response.json();
+        render(status);
+      }
+
+      async function setEnabled(enabled) {
+        const response = await fetch("/control/enabled", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enabled })
+        });
+        const status = await response.json();
+        render(status);
+      }
+
+      function render(status) {
+        const enabled = Boolean(status.feedEnabled);
+        stateLabel.textContent = enabled ? "Enabled" : "Disabled";
+        stateLabel.className = enabled ? "enabled" : "disabled";
+        detailLabel.textContent = enabled
+          ? "Receiving reader data and broadcasting to viewers."
+          : "Reader data is being ignored and viewers are paused.";
+        enableButton.classList.toggle("active", enabled);
+        disableButton.classList.toggle("active", !enabled);
+      }
+
+      enableButton.addEventListener("click", () => setEnabled(true));
+      disableButton.addEventListener("click", () => setEnabled(false));
+
+      loadStatus().catch((error) => {
+        stateLabel.textContent = "Unavailable";
+        stateLabel.className = "disabled";
+        detailLabel.textContent = error.message;
+      });
+    </script>
+  </body>
+</html>
