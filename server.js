@@ -95,5 +95,5 @@ wss.on("connection", (socket) => {
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Radar server listening on http://localhost:${PORT}`);
-  console.log(`WebSocket endpoint ws://localhost:${PORT}/ws`);
+  console.log(`Default WebSocket endpoint ws://159.223.228.189:${PORT}/ws`);
 });

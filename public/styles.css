@@ -267,6 +267,74 @@ code {
   margin-top: 12px;
 }
 
+.map-filters {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.filter-head,
+.team-filters,
+.player-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-head {
+  justify-content: space-between;
+}
+
+.filter-head button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.team-filters {
+  flex-wrap: wrap;
+}
+
+.team-filters label,
+.player-filter {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.player-filter-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.player-filter {
+  justify-content: space-between;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.player-filter span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-filter small {
+  color: #ffd66b;
+}
+
 .feed-card {
   margin-top: 18px;
 }
@@ -365,5 +433,9 @@ code {
   .topbar,
   .feed-card {
     padding: 12px;
+  }
+
+  .player-filter-list {
+    grid-template-columns: 1fr;
   }
 }

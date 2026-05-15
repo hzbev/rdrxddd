@@ -31,6 +31,17 @@
             <div class="radar-vignette"></div>
           </div>
           <div id="bomb-status" class="bomb-status"></div>
+          <div class="map-filters">
+            <div class="filter-head">
+              <strong>Map filters</strong>
+              <button id="reset-filters" type="button">Show all</button>
+            </div>
+            <div class="team-filters">
+              <label><input id="show-ct" type="checkbox" checked> Show CT</label>
+              <label><input id="show-t" type="checkbox" checked> Show T</label>
+            </div>
+            <div id="player-filter-list" class="player-filter-list"></div>
+          </div>
         </section>
 
         <aside class="team-panel">
@@ -43,7 +54,7 @@
         <div class="feed-row">
           <div>
             <h2>Live Feed</h2>
-            <p>Start this Express app, run the native reader, then open this page. The reader connects to <code>ws://127.0.0.1:3000/ws</code> and broadcasts each radar update here.</p>
+            <p>Start this Express app, run the native reader, then open this page. The reader connects to <code>ws://159.223.228.189:3000/ws</code> and broadcasts each radar update here.</p>
           </div>
           <strong id="last-update">No updates yet</strong>
         </div>

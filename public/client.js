@@ -1,4 +1,4 @@
-const SERVER_WS_URL = "ws://localhost:3000/ws";
+const SERVER_WS_URL = "ws://159.223.228.189:3000/ws";
 
 const mapMeta = {
   de_ancient: { image: "/maps/de_ancient_radar.png", origin: { x: -2953, y: 2164 }, scale: 5 },
@@ -33,6 +33,8 @@ const sampleState = {
 
 let radarState = sampleState;
 let socket = null;
+const hiddenTeams = loadFilterSet("radarHiddenTeams");
+const hiddenPlayers = loadFilterSet("radarHiddenPlayers");
 
 const elements = {
   mapName: document.querySelector("#map-name"),
@@ -43,8 +45,25 @@ const elements = {
   radar: document.querySelector("#radar"),
   ctList: document.querySelector("#ct-list"),
   tList: document.querySelector("#t-list"),
-  bombStatus: document.querySelector("#bomb-status")
+  bombStatus: document.querySelector("#bomb-status"),
+  showCt: document.querySelector("#show-ct"),
+  showT: document.querySelector("#show-t"),
+  playerFilterList: document.querySelector("#player-filter-list"),
+  resetFilters: document.querySelector("#reset-filters")
 };
+
+function loadFilterSet(key) {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(key) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveFilters() {
+  localStorage.setItem("radarHiddenTeams", JSON.stringify([...hiddenTeams]));
+  localStorage.setItem("radarHiddenPlayers", JSON.stringify([...hiddenPlayers]));
+}
 
 function normalizeIncomingState(message) {
   const state = message?.type === "radar-state" ? message.state : message;
@@ -121,6 +140,24 @@ function renderPlayerList(container, players) {
   }).join("");
 }
 
+function renderPlayerFilters(players) {
+  elements.showCt.checked = !hiddenTeams.has("CT");
+  elements.showT.checked = !hiddenTeams.has("T");
+
+  if (!players.length) {
+    elements.playerFilterList.innerHTML = '<p class="empty">No player filters yet</p>';
+    return;
+  }
+
+  elements.playerFilterList.innerHTML = players.map((player) => `
+    <label class="player-filter ${player.team.toLowerCase()}">
+      <input type="checkbox" data-player-id="${escapeHtml(player.id)}" ${hiddenPlayers.has(player.id) ? "" : "checked"}>
+      <span>${escapeHtml(player.name)}</span>
+      <small>${escapeHtml(player.team)}</small>
+    </label>
+  `).join("");
+}
+
 function render() {
   const meta = mapMeta[radarState.mapName] || mapMeta.de_mirage;
   const localPlayer = radarState.players.find((player) => player.self) || radarState.players[0];
@@ -132,7 +169,9 @@ function render() {
   elements.radar.style.backgroundImage = `url(${mapImage})`;
   elements.radar.querySelectorAll(".marker").forEach((marker) => marker.remove());
 
-  for (const player of players) {
+  const visiblePlayers = players.filter((player) => !hiddenTeams.has(player.team) && !hiddenPlayers.has(player.id));
+
+  for (const player of visiblePlayers) {
     const point = getRadarPoint(player, meta);
     const marker = document.createElement("div");
     marker.className = `marker ${player.team.toLowerCase()} ${player.alive ? "" : "dead"}`;
@@ -147,6 +186,7 @@ function render() {
 
   renderPlayerList(elements.ctList, players.filter((player) => player.team === "CT"));
   renderPlayerList(elements.tList, players.filter((player) => player.team === "T"));
+  renderPlayerFilters(players);
 
   const carrier = players.find((player) => player.id === radarState.bomb?.carrierId);
   elements.bombStatus.innerHTML = `
@@ -155,6 +195,36 @@ function render() {
     ${carrier ? `<span>Carrier: ${escapeHtml(carrier.name)}</span>` : ""}
   `;
 }
+
+elements.showCt.addEventListener("change", () => {
+  elements.showCt.checked ? hiddenTeams.delete("CT") : hiddenTeams.add("CT");
+  saveFilters();
+  render();
+});
+
+elements.showT.addEventListener("change", () => {
+  elements.showT.checked ? hiddenTeams.delete("T") : hiddenTeams.add("T");
+  saveFilters();
+  render();
+});
+
+elements.playerFilterList.addEventListener("change", (event) => {
+  const playerId = event.target?.dataset?.playerId;
+  if (!playerId) {
+    return;
+  }
+
+  event.target.checked ? hiddenPlayers.delete(playerId) : hiddenPlayers.add(playerId);
+  saveFilters();
+  render();
+});
+
+elements.resetFilters.addEventListener("click", () => {
+  hiddenTeams.clear();
+  hiddenPlayers.clear();
+  saveFilters();
+  render();
+});
 
 function connectSocket() {
   elements.socketStatus.textContent = "Connecting";
